@@ -1,0 +1,2114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Customer Manager</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Theme variables */
+        :root {
+            --primary: #2563eb;
+            --primary-light: #3b82f6;
+            --secondary: #f8fafc;
+            --dark: #0f172a;
+            --light: #f1f5f9;
+            --success: #0ea5e9;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --gray: #64748b;
+            --gray-light: #f1f5f9;
+            --header-bg: var(--dark);
+            --header-text: white;
+            --body-bg: var(--light);
+            --body-text: #334155;
+            --card-bg: white;
+            --card-border: none;
+            --theme-shadow: rgba(0, 0, 0, 0.08);
+            --font-family: 'Segoe UI', 'SF Pro Display', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+        
+        /* Galaxy Theme */
+        body.theme-galaxy {
+            --primary: #0284c7;
+            --primary-light: #38bdf8;
+            --secondary: #1e40af;
+            --dark: #0f172a;
+            --light: #e0f2fe;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #06b6d4;
+            --gray: #4b5563;
+            --gray-light: #e5e7eb;
+            --header-bg: #0f172a;
+            --header-text: #e0f2fe;
+            --body-bg: #0c0a20;
+            --body-text: #e0f2fe;
+            --card-bg: rgba(17, 24, 39, 0.7);
+            --card-border: 1px solid #1e40af;
+            --theme-shadow: rgba(14, 165, 233, 0.3);
+            --accent-purple: #7c3aed;
+            --font-family: Arial, 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        /* Zen Theme */
+        body.theme-zen {
+            --primary: #4d7c0f;
+            --primary-light: #65a30d;
+            --secondary: #ecfdf5;
+            --dark: #166534;
+            --light: #f0fdf4;
+            --success: #16a34a;
+            --danger: #b91c1c;
+            --warning: #ca8a04;
+            --info: #0284c7;
+            --gray: #4b5563;
+            --gray-light: #f0fdf4;
+            --header-bg: #166534;
+            --header-text: #f0fdf4;
+            --body-bg: #f0fdf4;
+            --body-text: #166534;
+            --card-bg: rgba(255, 255, 255, 0.85);
+            --card-border: 1px solid #dcfce7;
+            --theme-shadow: rgba(22, 101, 52, 0.1);
+            --font-family: 'Noto Serif', 'Merriweather', 'Georgia', serif;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-family);
+        }
+        
+        body {
+            background-color: var(--body-bg);
+            color: var(--body-text);
+            line-height: 1.6;
+            transition: all 0.4s ease;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 1.5rem;
+            text-align: center;
+            border-radius: 8px 8px 0 0;
+            box-shadow: 0 4px 12px var(--theme-shadow);
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        header h1 {
+            margin-bottom: 10px;
+            color: var(--header-text);
+            font-size: 2.2rem;
+        }
+        
+        .subheader {
+            color: var(--secondary);
+            font-size: 1.1rem;
+            font-weight: normal;
+        }
+        
+        .theme-selector {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+            align-items: center;
+        }
+        
+        .theme-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--header-text);
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        /* Default theme icons in header */
+        body .theme-button i {
+            color: white;
+        }
+        
+        /* Theme menu styling updates */
+        .theme-menu {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px var(--theme-shadow);
+            width: 180px;
+            display: none;
+            z-index: 100;
+            padding: 12px;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        
+        .theme-menu.active {
+            display: block;
+        }
+        
+        .theme-option {
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            color: #334155;
+        }
+        
+        .theme-option:hover {
+            background: #f8fafc;
+        }
+        
+        .theme-icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        }
+        
+        .icon-default {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+        }
+        
+        .icon-galaxy {
+            background: linear-gradient(135deg, #4c1d95 0%, #0284c7 100%);
+        }
+        
+        .icon-zen {
+            background: linear-gradient(135deg, #166534 0%, #65a30d 100%);
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--theme-shadow);
+            padding: 20px;
+            margin-bottom: 20px;
+            border: var(--card-border);
+            transition: background-color 0.3s ease;
+        }
+        
+        h1, h2, h3 {
+            color: var(--dark);
+        }
+        
+        h2 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--primary-light);
+            font-size: 1.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+            background-color: #fff;
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .btn-secondary {
+            background-color: var(--gray);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+        
+        .btn-info {
+            background-color: var(--info);
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background-color: #0891b2;
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        
+        .mb-20 {
+            margin-bottom: 20px;
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .search-bar input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+        
+        .customer-list {
+            max-height: 350px;
+            overflow-y: auto;
+        }
+        
+        .customer-card {
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            background-color: var(--card-bg);
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .customer-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px var(--theme-shadow);
+        }
+        
+        .duplicate-contact {
+            border-left: 4px solid var(--warning);
+        }
+        
+        .customer-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-size: 1.2rem;
+            padding-right: 80px;
+        }
+        
+        .customer-card p {
+            margin-bottom: 5px;
+            color: var(--body-text);
+        }
+        
+        .customer-card p strong {
+            display: inline-block;
+            min-width: 100px;
+        }
+        
+        .customer-actions {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+        
+        .edit-btn {
+            color: var(--info);
+        }
+        
+        .edit-btn:hover {
+            color: white;
+            background-color: var(--info);
+        }
+        
+        .delete-btn {
+            color: var(--danger);
+        }
+        
+        .delete-btn:hover {
+            color: white;
+            background-color: var(--danger);
+        }
+        
+        .call-btn {
+            color: var(--success);
+        }
+        
+        .call-btn:hover {
+            color: white;
+            background-color: var(--success);
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .badge-warning {
+            background-color: var(--warning);
+            color: #212529;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            color: var(--gray-light);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab:hover:not(.active) {
+            background-color: var(--gray-light);
+        }
+        
+        .action-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        #importExport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s;
+        }
+        
+        #importExport.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            max-width: 500px;
+            width: 90%;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .modal-header h2 {
+            margin: 0;
+            border: none;
+            padding: 0;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+        
+        .modal-footer {
+            margin-top: 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+        
+        #toastContainer {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        
+        .toast {
+            padding: 12px 20px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transform: translateX(120%);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toast.show {
+            transform: translateX(0);
+        }
+        
+        .toast i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .toast-success {
+            background-color: var(--success);
+        }
+        
+        .toast-error {
+            background-color: var(--danger);
+        }
+        
+        .toast-info {
+            background-color: var(--info);
+        }
+        
+        .toast-warning {
+            background-color: var(--warning);
+            color: #212529;
+        }
+        
+        .calc-result {
+            background-color: var(--gray-light);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .calc-result h3 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 10px var(--theme-shadow);
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .stat-card h3 {
+            font-size: 1.8rem;
+            margin-bottom: 5px;
+        }
+        
+        .stat-card p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .stat-primary h3 {
+            color: var(--primary);
+        }
+        
+        .stat-info h3 {
+            color: var(--info);
+        }
+        
+        .stat-warning h3 {
+            color: var(--warning);
+        }
+        
+        .stat-success h3 {
+            color: var(--success);
+        }
+
+        /* Enhanced styling for Galaxy theme */
+        body.theme-galaxy {
+            background-image: 
+                radial-gradient(circle at 25% 10%, rgba(124, 58, 237, 0.1) 0%, transparent 25%),
+                radial-gradient(circle at 80% 40%, rgba(14, 165, 233, 0.15) 0%, transparent 30%),
+                radial-gradient(circle at 35% 65%, rgba(217, 70, 239, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 65% 85%, rgba(124, 58, 237, 0.1) 0%, transparent 25%);
+        }
+
+        body.theme-galaxy:before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(1px 1px at 50px 160px, #ffffff 0%, transparent 100%),
+                radial-gradient(1px 1px at 90px 40px, #ffffff 0%, transparent 100%),
+                radial-gradient(1px 1px at 130px 80px, #ffffff 0%, transparent 100%),
+                radial-gradient(1px 1px at 160px 120px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 200px 30px, #8b5cf6 0%, transparent 100%),
+                radial-gradient(2px 2px at 300px 160px, #8b5cf6 0%, transparent 100%),
+                radial-gradient(2px 2px at 400px 60px, #8b5cf6 0%, transparent 100%),
+                radial-gradient(2px 2px at 500px 100px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 50px 400px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 150px 300px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 250px 500px, #8b5cf6 0%, transparent 100%),
+                radial-gradient(2px 2px at 400px 450px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 550px 350px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 650px 550px, #8b5cf6 0%, transparent 100%),
+                radial-gradient(2px 2px at 700px 200px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 750px 350px, #ffffff 0%, transparent 100%),
+                radial-gradient(2px 2px at 800px 500px, #8b5cf6 0%, transparent 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        body.theme-galaxy:after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(circle at 20% 35%, rgba(139, 92, 246, 0.3) 0%, transparent 25%),
+                radial-gradient(circle at 80% 20%, rgba(67, 56, 202, 0.3) 0%, transparent 20%);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+        
+        body.theme-galaxy .card {
+            background: rgba(17, 24, 39, 0.7);
+            border: 1px solid rgba(14, 165, 233, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(2, 132, 199, 0.2);
+        }
+        
+        body.theme-galaxy .stat-card {
+            background: rgba(17, 24, 39, 0.8);
+            border: 1px solid rgba(14, 165, 233, 0.4);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+        }
+        
+        body.theme-galaxy header {
+            background: linear-gradient(to right, #0f172a, #1e40af);
+            box-shadow: 0 4px 20px rgba(2, 132, 199, 0.4);
+            border-bottom: 1px solid rgba(56, 189, 248, 0.3);
+        }
+        
+        body.theme-galaxy .customer-card {
+            background: rgba(17, 24, 39, 0.7);
+            border-left: 4px solid var(--primary);
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+        }
+        
+        body.theme-galaxy .customer-card:hover {
+            transform: translateY(-4px) scale(1.01);
+            box-shadow: 0 8px 24px rgba(14, 165, 233, 0.4);
+            background: rgba(30, 41, 59, 0.8);
+        }
+        
+        /* Fixed input styling for galaxy theme */
+        body.theme-galaxy input, 
+        body.theme-galaxy select, 
+        body.theme-galaxy textarea {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #1e293b;
+            border: 1px solid rgba(56, 189, 248, 0.5);
+            font-weight: 500;
+        }
+        
+        body.theme-galaxy input:focus, 
+        body.theme-galaxy select:focus, 
+        body.theme-galaxy textarea:focus {
+            border-color: #0284c7;
+            background-color: #fff;
+            box-shadow: 0 0 0 2px rgba(14, 165, 233, 0.3);
+        }
+        
+        /* Galaxy theme with improved label readability */
+        body.theme-galaxy label {
+            color: #e0e7ff;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        body.theme-galaxy h2, 
+        body.theme-galaxy h3 {
+            color: #e0e7ff;
+        }
+        
+        body.theme-galaxy .form-group p {
+            color: #e0e7ff;
+        }
+        
+        body.theme-galaxy #customerInfo label {
+            font-weight: 700;
+        }
+
+        /* Enhanced styling for zen theme */
+        body.theme-zen {
+            background-image: 
+                linear-gradient(to bottom, rgba(240, 253, 244, 0.8), rgba(240, 253, 244, 0.9)),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23bef264' fill-opacity='0.2' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        body.theme-zen:before {
+            content: '';
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3E%3Cpath fill='%2315803d' fill-opacity='0.2' d='M0,256L48,261.3C96,267,192,277,288,245.3C384,213,480,139,576,117.3C672,96,768,128,864,149.3C960,171,1056,181,1152,176C1248,171,1344,149,1392,138.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        body.theme-zen header {
+            background: linear-gradient(to right, #166534, #15803d);
+            border-bottom: 3px solid rgba(134, 239, 172, 0.3);
+        }
+        
+        body.theme-zen .card, 
+        body.theme-zen .stat-card {
+            background-color: rgba(255, 255, 255, 0.9);
+            border: 1px solid #dcfce7;
+            box-shadow: 0 4px 12px rgba(22, 101, 52, 0.08);
+        }
+        
+        body.theme-zen .card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        body.theme-zen .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(to right, #16a34a, #65a30d);
+        }
+        
+        body.theme-zen .btn-primary {
+            background-color: #16a34a;
+            transition: all 0.3s ease;
+        }
+        
+        body.theme-zen .btn-primary:hover {
+            background-color: #15803d;
+            transform: translateY(-2px);
+        }
+        
+        body.theme-zen .customer-card {
+            border-left: 4px solid #16a34a;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+        }
+        
+        body.theme-zen .customer-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 16px rgba(22, 101, 52, 0.12);
+        }
+        
+        /* Improved contrast for zen theme */
+        body.theme-zen input, 
+        body.theme-zen select, 
+        body.theme-zen textarea {
+            border: 1px solid #84cc16;
+        }
+        
+        /* File upload styles */
+        .file-upload {
+            border: 2px dashed var(--gray-light);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:hover {
+            border-color: var(--primary);
+        }
+        
+        .file-upload i {
+            font-size: 2rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .file-upload p {
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+        
+        .file-upload span {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+        }
+        
+        .radio-option input {
+            width: auto;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="theme-selector">
+            <button id="themeToggleBtn" class="theme-button">
+                <i class="fas fa-palette"></i>
+            </button>
+            <div id="themeMenu" class="theme-menu">
+                <div class="theme-option" data-theme="default">
+                    <div class="theme-icon icon-default"><i class="fas fa-home"></i></div>
+                    Default
+                </div>
+                <div class="theme-option" data-theme="galaxy">
+                    <div class="theme-icon icon-galaxy"><i class="fas fa-rocket"></i></div>
+                    Galaxy
+                </div>
+                <div class="theme-option" data-theme="zen">
+                    <div class="theme-icon icon-zen"><i class="fas fa-leaf"></i></div>
+                    Zen
+                </div>
+            </div>
+        </div>
+        <h1>Mortgage Customer Manager</h1>
+        <div class="subheader">Track and manage your funded loans and customer relationships</div>
+    </header>
+    
+    <div class="container">
+        <div class="stats-container">
+            <div class="stat-card stat-primary">
+                <h3 id="totalCustomers">0</h3>
+                <p>Total Customers</p>
+            </div>
+            <div class="stat-card stat-info">
+                <h3 id="totalLoans">$0</h3>
+                <p>Total Loan Volume</p>
+            </div>
+            <div class="stat-card stat-warning">
+                <h3 id="duplicateContacts">0</h3>
+                <p>Duplicate Contacts</p>
+            </div>
+            <div class="stat-card stat-success">
+                <h3 id="avgLoanAmount">$0</h3>
+                <p>Avg. Loan Amount</p>
+            </div>
+        </div>
+        
+        <div class="action-bar">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Search customers...">
+            </div>
+            <div class="search-actions">
+                <button id="importExportBtn" class="btn-secondary">Import/Export</button>
+                <button id="addCustomerBtn" class="btn-primary">Add Customer</button>
+            </div>
+        </div>
+        
+        <div class="dashboard">
+            <div class="left-panel">
+                <!-- Mortgage Calculator -->
+                <div class="card">
+                    <h2>Mortgage Calculator</h2>
+                    <div class="form-group">
+                        <label for="calcLoanAmount">Loan Amount</label>
+                        <input type="number" id="calcLoanAmount" value="300000">
+                    </div>
+                    <div class="form-group">
+                        <label for="calcInterestRate">Interest Rate (%)</label>
+                        <input type="number" id="calcInterestRate" value="5.5" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="calcLoanTerm">Loan Term (years)</label>
+                        <select id="calcLoanTerm">
+                            <option value="30">30 years</option>
+                            <option value="20">20 years</option>
+                            <option value="15">15 years</option>
+                            <option value="10">10 years</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="calcPropertyTax">Annual Property Tax</label>
+                        <input type="number" id="calcPropertyTax" value="3600">
+                    </div>
+                    <div class="form-group">
+                        <label for="calcInsurance">Annual Insurance</label>
+                        <input type="number" id="calcInsurance" value="1200">
+                    </div>
+                    <button id="calculateBtn" class="btn-primary btn-block">Calculate</button>
+                    
+                    <div class="calc-result">
+                        <div class="result-row">
+                            <p>Principal & Interest</p>
+                            <h3 id="monthlyPayment">$0</h3>
+                        </div>
+                        <div class="result-row">
+                            <p>Total Payment (with Tax & Insurance)</p>
+                            <h3 id="totalPayment">$0</h3>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Customer List -->
+                <div class="card">
+                    <div class="tabs">
+                        <div class="tab active" data-tab="allCustomers">All Customers</div>
+                        <div class="tab" data-tab="duplicateContacts">Duplicates</div>
+                    </div>
+                    <div id="customerList" class="customer-list">
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>No customers yet</h3>
+                            <p>Add your first customer to get started</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-panel">
+                <div id="customerForm" class="card" style="display: none;">
+                    <h2>Add New Customer</h2>
+                    <form id="addEditCustomerForm">
+                        <input type="hidden" id="customerId">
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="primaryFirstName">Primary Borrower First Name</label>
+                                <input type="text" id="primaryFirstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="primaryLastName">Primary Borrower Last Name</label>
+                                <input type="text" id="primaryLastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="coFirstName">Co-Borrower First Name</label>
+                                <input type="text" id="coFirstName">
+                            </div>
+                            <div class="form-group">
+                                <label for="coLastName">Co-Borrower Last Name</label>
+                                <input type="text" id="coLastName">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="primaryPhone">Primary Phone</label>
+                                <input type="tel" id="primaryPhone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="primaryCellPhone">Cell Phone</label>
+                                <input type="tel" id="primaryCellPhone">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="birthDate">Birth Date</label>
+                                <input type="date" id="birthDate">
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="propertyValue">Property Value</label>
+                                <input type="number" id="propertyValue" required min="0">
+                            </div>
+                            <div class="form-group">
+                                <label for="loanAmount">Loan Amount</label>
+                                <input type="number" id="loanAmount" required min="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="ltv">LTV</label>
+                                <input type="text" id="ltv" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="loanPurpose">Loan Purpose</label>
+                                <select id="loanPurpose" required>
+                                    <option value="">Select Purpose</option>
+                                    <option value="Purchase">Purchase</option>
+                                    <option value="Refinance">Refinance</option>
+                                    <option value="Cash-Out Refinance">Cash-Out Refinance</option>
+                                    <option value="Home Equity">Home Equity</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="rate">Interest Rate</label>
+                                <input type="text" id="rate">
+                            </div>
+                            <div class="form-group">
+                                <label for="fundedDate">Funded Date</label>
+                                <input type="date" id="fundedDate">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="propertyAddress">Property Address</label>
+                                <input type="text" id="propertyAddress">
+                            </div>
+                            <div class="form-group">
+                                <label for="propertyState">State</label>
+                                <select id="propertyState">
+                                    <option value="">Select State</option>
+                                    <option value="AL">Alabama</option>
+                                    <option value="AK">Alaska</option>
+                                    <option value="AZ">Arizona</option>
+                                    <option value="AR">Arkansas</option>
+                                    <option value="CA">California</option>
+                                    <option value="CO">Colorado</option>
+                                    <option value="CT">Connecticut</option>
+                                    <option value="DE">Delaware</option>
+                                    <option value="FL">Florida</option>
+                                    <option value="GA">Georgia</option>
+                                    <option value="HI">Hawaii</option>
+                                    <option value="ID">Idaho</option>
+                                    <option value="IL">Illinois</option>
+                                    <option value="IN">Indiana</option>
+                                    <option value="IA">Iowa</option>
+                                    <option value="KS">Kansas</option>
+                                    <option value="KY">Kentucky</option>
+                                    <option value="LA">Louisiana</option>
+                                    <option value="ME">Maine</option>
+                                    <option value="MD">Maryland</option>
+                                    <option value="MA">Massachusetts</option>
+                                    <option value="MI">Michigan</option>
+                                    <option value="MN">Minnesota</option>
+                                    <option value="MS">Mississippi</option>
+                                    <option value="MO">Missouri</option>
+                                    <option value="MT">Montana</option>
+                                    <option value="NE">Nebraska</option>
+                                    <option value="NV">Nevada</option>
+                                    <option value="NH">New Hampshire</option>
+                                    <option value="NJ">New Jersey</option>
+                                    <option value="NM">New Mexico</option>
+                                    <option value="NY">New York</option>
+                                    <option value="NC">North Carolina</option>
+                                    <option value="ND">North Dakota</option>
+                                    <option value="OH">Ohio</option>
+                                    <option value="OK">Oklahoma</option>
+                                    <option value="OR">Oregon</option>
+                                    <option value="PA">Pennsylvania</option>
+                                    <option value="RI">Rhode Island</option>
+                                    <option value="SC">South Carolina</option>
+                                    <option value="SD">South Dakota</option>
+                                    <option value="TN">Tennessee</option>
+                                    <option value="TX">Texas</option>
+                                    <option value="UT">Utah</option>
+                                    <option value="VT">Vermont</option>
+                                    <option value="VA">Virginia</option>
+                                    <option value="WA">Washington</option>
+                                    <option value="WV">West Virginia</option>
+                                    <option value="WI">Wisconsin</option>
+                                    <option value="WY">Wyoming</option>
+                                    <option value="DC">District of Columbia</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <button type="submit" class="btn-primary btn-block">Save Customer</button>
+                            <button type="button" id="cancelFormBtn" class="btn-secondary btn-block">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="customerDetail" class="card" style="display: none;">
+                    <h2 id="customerName">Customer Details</h2>
+                    <div id="customerInfo" class="customer-info">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Phone</label>
+                                <p id="detailPhone">-</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Email</label>
+                                <p id="detailEmail">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Loan Amount</label>
+                                <p id="detailLoanAmount">-</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Loan Purpose</label>
+                                <p id="detailLoanPurpose">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Property Value</label>
+                                <p id="detailPropertyValue">-</p>
+                            </div>
+                            <div class="form-group">
+                                <label>LTV</label>
+                                <p id="detailLTV">-</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Notes</label>
+                            <p id="detailNotes" style="background-color: var(--gray-light); padding: 10px; border-radius: 4px; min-height: 80px;">-</p>
+                        </div>
+                        
+                        <div class="form-row">
+                            <button id="editCustomerBtn" class="btn-info btn-block">Edit Customer</button>
+                            <button id="closeDetailBtn" class="btn-secondary btn-block">Back to List</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="welcomeScreen" class="card">
+                    <div class="empty-state">
+                        <i class="fas fa-home"></i>
+                        <h3>Welcome to Mortgage Customer Manager</h3>
+                        <p>Select a customer from the list or add a new customer to get started</p>
+                        <button id="welcomeAddBtn" class="btn-primary" style="margin-top: 20px;">Add Your First Customer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="importExport">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Import/Export Data</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="importCSV" name="fileType" value="csv" checked>
+                        <label for="importCSV">CSV</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="importJSON" name="fileType" value="json">
+                        <label for="importJSON">JSON</label>
+                    </div>
+                </div>
+                
+                <div class="file-upload" id="fileUploadArea">
+                    <i class="fas fa-file-upload"></i>
+                    <p>Drag and drop your file here</p>
+                    <span>or</span>
+                    <input type="file" id="importFile" accept=".json,.csv" style="display: none;">
+                    <button type="button" id="browseFileBtn" class="btn-secondary" style="margin-top: 10px;">Browse Files</button>
+                </div>
+                
+                <div id="uploadedFileName" style="text-align: center; margin-top: 10px; display: none;"></div>
+                
+                <p class="mb-20">Import your customer data from a CSV or JSON file, or export your current data to back it up.</p>
+                
+                <div class="modal-footer">
+                    <button id="exportDataBtn" class="btn-info">Export Data</button>
+                    <button id="importDataBtn" class="btn-primary">Import Data</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="toastContainer"></div>
+    
+    <script>
+        // Global variables
+        let customers = [];
+        let contactLogs = [];
+        let filteredCustomers = [];
+        let currentTab = 'allCustomers';
+        let selectedCustomerId = null;
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded");
+            initializeApp();
+        });
+        
+        function initializeApp() {
+            loadFromLocalStorage();
+            setupEventListeners();
+            setupCalculations();
+            renderCustomerList();
+            updateStats();
+            calculateMortgage(); // Calculate initial mortgage
+            setupThemeToggle();
+            setupFileUpload();
+            
+            // Apply initial theme icon to button
+            const savedTheme = localStorage.getItem('mortgageTheme');
+            if (savedTheme) {
+                updateThemeButtonIcon(savedTheme);
+            }
+        }
+        
+        // Load data from localStorage
+        function loadFromLocalStorage() {
+            const savedCustomers = localStorage.getItem('mortgageCustomers');
+            const savedContactLogs = localStorage.getItem('mortgageContactLogs');
+            
+            if (savedCustomers) {
+                try {
+                    customers = JSON.parse(savedCustomers);
+                } catch(e) {
+                    console.error("Error parsing saved customers:", e);
+                    customers = [];
+                }
+            }
+            
+            if (savedContactLogs) {
+                try {
+                    contactLogs = JSON.parse(savedContactLogs);
+                } catch(e) {
+                    console.error("Error parsing saved contact logs:", e);
+                    contactLogs = [];
+                }
+            }
+        }
+        
+        // Save data to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('mortgageCustomers', JSON.stringify(customers));
+            localStorage.setItem('mortgageContactLogs', JSON.stringify(contactLogs));
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            // Add Customer button
+            document.getElementById('addCustomerBtn').addEventListener('click', function() {
+                console.log("Add customer button clicked");
+                showAddCustomerForm();
+            });
+            
+            document.getElementById('welcomeAddBtn').addEventListener('click', function() {
+                console.log("Welcome add button clicked");
+                showAddCustomerForm();
+            });
+            
+            // Customer form
+            document.getElementById('addEditCustomerForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                console.log("Form submitted");
+                handleCustomerFormSubmit();
+            });
+            
+            document.getElementById('cancelFormBtn').addEventListener('click', function() {
+                hideCustomerForm();
+            });
+            
+            // Customer detail
+            document.getElementById('editCustomerBtn').addEventListener('click', function() {
+                editCustomer(selectedCustomerId);
+            });
+            
+            document.getElementById('closeDetailBtn').addEventListener('click', function() {
+                document.getElementById('customerDetail').style.display = 'none';
+                document.getElementById('welcomeScreen').style.display = 'block';
+                selectedCustomerId = null;
+            });
+            
+            // Mortgage calculator
+            document.getElementById('calculateBtn').addEventListener('click', function() {
+                calculateMortgage();
+            });
+            
+            // Search
+            document.getElementById('searchInput').addEventListener('input', function() {
+                renderCustomerList();
+            });
+            
+            // Tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentTab = this.dataset.tab;
+                    renderCustomerList();
+                });
+            });
+            
+            // Import/Export
+            document.getElementById('importExportBtn').addEventListener('click', function() {
+                document.getElementById('importExport').classList.add('active');
+            });
+            
+            document.querySelector('.close-modal').addEventListener('click', function() {
+                document.getElementById('importExport').classList.remove('active');
+            });
+            
+            document.getElementById('exportDataBtn').addEventListener('click', function() {
+                exportData();
+            });
+            
+            document.getElementById('importDataBtn').addEventListener('click', function() {
+                importData();
+            });
+            
+            // File type change
+            document.querySelectorAll('input[name="fileType"]').forEach(input => {
+                input.addEventListener('change', function() {
+                    const fileType = this.value;
+                    document.getElementById('importFile').setAttribute('accept', fileType === 'csv' ? '.csv' : '.json');
+                });
+            });
+        }
+        
+        // Setup file upload
+        function setupFileUpload() {
+            const fileUploadArea = document.getElementById('fileUploadArea');
+            const importFile = document.getElementById('importFile');
+            const browseFileBtn = document.getElementById('browseFileBtn');
+            const uploadedFileName = document.getElementById('uploadedFileName');
+            
+            // Browse button
+            browseFileBtn.addEventListener('click', function() {
+                importFile.click();
+            });
+            
+            // File selection
+            importFile.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    uploadedFileName.textContent = this.files[0].name;
+                    uploadedFileName.style.display = 'block';
+                } else {
+                    uploadedFileName.style.display = 'none';
+                }
+            });
+            
+            // Drag and drop
+            fileUploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = 'var(--primary)';
+            });
+            
+            fileUploadArea.addEventListener('dragleave', function() {
+                fileUploadArea.style.borderColor = 'var(--gray-light)';
+            });
+            
+            fileUploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                fileUploadArea.style.borderColor = 'var(--gray-light)';
+                
+                if (e.dataTransfer.files.length > 0) {
+                    const file = e.dataTransfer.files[0];
+                    const fileTypeRadios = document.querySelectorAll('input[name="fileType"]');
+                    
+                    // Auto-select file type based on extension
+                    if (file.name.toLowerCase().endsWith('.csv')) {
+                        fileTypeRadios[0].checked = true;
+                    } else if (file.name.toLowerCase().endsWith('.json')) {
+                        fileTypeRadios[1].checked = true;
+                    }
+                    
+                    // Create a new DataTransfer object
+                    const dataTransfer = new DataTransfer();
+                    dataTransfer.items.add(file);
+                    
+                    // Set the file to the file input
+                    importFile.files = dataTransfer.files;
+                    uploadedFileName.textContent = file.name;
+                    uploadedFileName.style.display = 'block';
+                }
+            });
+        }
+        
+        // Setup LTV calculation
+        function setupCalculations() {
+            const loanAmountInput = document.getElementById('loanAmount');
+            const propertyValueInput = document.getElementById('propertyValue');
+            const ltvInput = document.getElementById('ltv');
+            
+            function calculateLTV() {
+                const loanAmount = parseFloat(loanAmountInput.value) || 0;
+                const propertyValue = parseFloat(propertyValueInput.value) || 0;
+                
+                if (propertyValue > 0) {
+                    const ltv = (loanAmount / propertyValue) * 100;
+                    ltvInput.value = ltv.toFixed(2) + '%';
+                } else {
+                    ltvInput.value = '';
+                }
+            }
+            
+            loanAmountInput.addEventListener('input', calculateLTV);
+            propertyValueInput.addEventListener('input', calculateLTV);
+        }
+        
+        // Calculate mortgage payment
+        function calculateMortgage() {
+            const loanAmount = parseFloat(document.getElementById('calcLoanAmount').value) || 0;
+            const interestRate = parseFloat(document.getElementById('calcInterestRate').value) || 0;
+            const loanTerm = parseInt(document.getElementById('calcLoanTerm').value) || 30;
+            
+            // Calculate monthly payment
+            const monthlyRate = interestRate / 100 / 12;
+            const numberOfPayments = loanTerm * 12;
+            let monthlyPayment = 0;
+            
+            if (monthlyRate > 0) {
+                monthlyPayment = loanAmount * (monthlyRate * Math.pow(1 + monthlyRate, numberOfPayments)) / (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
+            } else {
+                monthlyPayment = loanAmount / numberOfPayments;
+            }
+            
+            // Update result
+            document.getElementById('monthlyPayment').textContent = '$' + monthlyPayment.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+        
+        // Show add customer form
+        function showAddCustomerForm() {
+            console.log("Showing add customer form");
+            // Reset form
+            document.getElementById('addEditCustomerForm').reset();
+            document.getElementById('customerId').value = '';
+            
+            // Update form title
+            document.querySelector('#customerForm h2').textContent = 'Add New Customer';
+            
+            // Show form, hide other panels
+            document.getElementById('customerForm').style.display = 'block';
+            document.getElementById('customerDetail').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'none';
+            
+            // Focus on first input
+            document.getElementById('primaryFirstName').focus();
+        }
+        
+        // Hide customer form
+        function hideCustomerForm() {
+            document.getElementById('customerForm').style.display = 'none';
+            
+            if (selectedCustomerId) {
+                document.getElementById('customerDetail').style.display = 'block';
+            } else {
+                document.getElementById('welcomeScreen').style.display = 'block';
+            }
+        }
+        
+        // Handle customer form submit
+        function handleCustomerFormSubmit() {
+            const customerId = document.getElementById('customerId').value;
+            const isEdit = customerId !== '';
+            
+            const customer = {
+                id: isEdit ? customerId : Date.now().toString(),
+                primaryFirstName: document.getElementById('primaryFirstName').value,
+                primaryLastName: document.getElementById('primaryLastName').value,
+                primaryFullName: document.getElementById('primaryFirstName').value + ' ' + document.getElementById('primaryLastName').value,
+                coFirstName: document.getElementById('coFirstName').value,
+                coLastName: document.getElementById('coLastName').value,
+                coFullName: document.getElementById('coFirstName').value && document.getElementById('coLastName').value ? 
+                           document.getElementById('coFirstName').value + ' ' + document.getElementById('coLastName').value : '',
+                primaryPhone: document.getElementById('primaryPhone').value,
+                primaryCellPhone: document.getElementById('primaryCellPhone').value,
+                email: document.getElementById('email').value,
+                birthDate: document.getElementById('birthDate').value,
+                loanPurpose: document.getElementById('loanPurpose').value,
+                loanAmount: parseFloat(document.getElementById('loanAmount').value) || 0,
+                propertyValue: parseFloat(document.getElementById('propertyValue').value) || 0,
+                ltv: document.getElementById('ltv').value,
+                rate: document.getElementById('rate').value,
+                propertyAddress: document.getElementById('propertyAddress').value,
+                propertyState: document.getElementById('propertyState').value,
+                fundedDate: document.getElementById('fundedDate').value,
+                notes: document.getElementById('notes').value,
+                createdAt: isEdit ? (customers.find(c => c.id === customerId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            if (isEdit) {
+                // Update existing customer
+                const index = customers.findIndex(c => c.id === customerId);
+                if (index !== -1) {
+                    customers[index] = customer;
+                }
+                showToast('Customer updated successfully', 'success');
+            } else {
+                // Add new customer
+                customers.push(customer);
+                showToast('Customer added successfully', 'success');
+            }
+            
+            // Save data
+            saveToLocalStorage();
+            
+            // Update UI
+            renderCustomerList();
+            updateStats();
+            
+            // Show customer details
+            showCustomerDetails(customer.id);
+        }
+        
+        // Show customer details
+        function showCustomerDetails(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (!customer) {
+                return;
+            }
+            
+            selectedCustomerId = customerId;
+            
+            // Update customer details view
+            document.getElementById('customerName').textContent = customer.primaryFullName;
+            document.getElementById('detailPhone').textContent = customer.primaryPhone || '-';
+            document.getElementById('detailEmail').textContent = customer.email || '-';
+            document.getElementById('detailLoanAmount').textContent = '$' + (customer.loanAmount || 0).toLocaleString();
+            document.getElementById('detailLoanPurpose').textContent = customer.loanPurpose || '-';
+            document.getElementById('detailPropertyValue').textContent = customer.propertyValue ? '$' + customer.propertyValue.toLocaleString() : '-';
+            document.getElementById('detailLTV').textContent = customer.ltv || '-';
+            document.getElementById('detailNotes').textContent = customer.notes || 'No notes available';
+            
+            // Show details view, hide other panels
+            document.getElementById('customerDetail').style.display = 'block';
+            document.getElementById('customerForm').style.display = 'none';
+            document.getElementById('welcomeScreen').style.display = 'none';
+        }
+        
+        // Edit customer
+        function editCustomer(customerId) {
+            const customer = customers.find(c => c.id === customerId);
+            
+            if (!customer) {
+                return;
+            }
+            
+            // Populate form
+            document.getElementById('customerId').value = customer.id;
+            document.getElementById('primaryFirstName').value = customer.primaryFirstName || '';
+            document.getElementById('primaryLastName').value = customer.primaryLastName || '';
+            document.getElementById('coFirstName').value = customer.coFirstName || '';
+            document.getElementById('coLastName').value = customer.coLastName || '';
+            document.getElementById('primaryPhone').value = customer.primaryPhone || '';
+            document.getElementById('primaryCellPhone').value = customer.primaryCellPhone || '';
+            document.getElementById('birthDate').value = customer.birthDate || '';
+            document.getElementById('email').value = customer.email || '';
+            document.getElementById('loanPurpose').value = customer.loanPurpose || '';
+            document.getElementById('loanAmount').value = customer.loanAmount || '';
+            document.getElementById('propertyValue').value = customer.propertyValue || '';
+            document.getElementById('ltv').value = customer.ltv || '';
+            document.getElementById('rate').value = customer.rate || '';
+            document.getElementById('propertyAddress').value = customer.propertyAddress || '';
+            document.getElementById('propertyState').value = customer.propertyState || '';
+            document.getElementById('fundedDate').value = customer.fundedDate || '';
+            document.getElementById('notes').value = customer.notes || '';
+            
+            // Update form title
+            document.querySelector('#customerForm h2').textContent = 'Edit Customer';
+            
+            // Show form, hide details
+            document.getElementById('customerForm').style.display = 'block';
+            document.getElementById('customerDetail').style.display = 'none';
+        }
+        
+        // Delete customer
+        function deleteCustomer(customerId) {
+            if (!confirm('Are you sure you want to delete this customer?')) {
+                return;
+            }
+            
+            // Remove customer
+            customers = customers.filter(c => c.id !== customerId);
+            
+            // Save data
+            saveToLocalStorage();
+            
+            // Update UI
+            renderCustomerList();
+            updateStats();
+            
+            // If deleted customer was selected
+            if (selectedCustomerId === customerId) {
+                selectedCustomerId = null;
+                document.getElementById('customerDetail').style.display = 'none';
+                document.getElementById('welcomeScreen').style.display = 'block';
+            }
+            
+            showToast('Customer deleted', 'success');
+        }
+        
+        // Render customer list
+        function renderCustomerList() {
+            const customerList = document.getElementById('customerList');
+            const searchText = document.getElementById('searchInput').value.toLowerCase();
+            
+            // Get duplicate phone numbers
+            const phoneNumberCounts = {};
+            customers.forEach(customer => {
+                if (customer.primaryPhone) {
+                    phoneNumberCounts[customer.primaryPhone] = (phoneNumberCounts[customer.primaryPhone] || 0) + 1;
+                }
+            });
+            
+            // Filter customers
+            let customersToShow = [...customers];
+            
+            // Filter by search
+            if (searchText) {
+                customersToShow = customersToShow.filter(customer => 
+                    customer.primaryFullName.toLowerCase().includes(searchText) || 
+                    (customer.primaryPhone && customer.primaryPhone.includes(searchText))
+                );
+            }
+            
+            // Filter by duplicates tab
+            if (currentTab === 'duplicateContacts') {
+                customersToShow = customersToShow.filter(customer => 
+                    customer.primaryPhone && phoneNumberCounts[customer.primaryPhone] > 1
+                );
+            }
+            
+            // Sort by date (newest first)
+            customersToShow.sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt));
+            
+            filteredCustomers = customersToShow;
+            
+            // Show empty state if no customers
+            if (customersToShow.length === 0) {
+                customerList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-search"></i>
+                        <h3>No customers found</h3>
+                        <p>Try adjusting your search</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Render customers
+            let html = '';
+            
+            customersToShow.forEach(customer => {
+                const isDuplicate = customer.primaryPhone && phoneNumberCounts[customer.primaryPhone] > 1;
+                
+                html += `
+                    <div class="customer-card ${isDuplicate ? 'duplicate-contact' : ''}" data-id="${customer.id}">
+                        <h3>${customer.primaryFullName}</h3>
+                        <p><strong>Phone:</strong> ${customer.primaryPhone || '-'}</p>
+                        <p><strong>Loan Amount:</strong> $${(customer.loanAmount || 0).toLocaleString()}</p>
+                        <div class="customer-actions">
+                            <button class="action-btn edit-btn" onclick="editCustomer('${customer.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="action-btn delete-btn" onclick="deleteCustomer('${customer.id}')">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            customerList.innerHTML = html;
+            
+            // Add click event to customer cards
+            document.querySelectorAll('.customer-card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    // Ignore clicks on action buttons
+                    if (e.target.closest('.customer-actions')) {
+                        return;
+                    }
+                    
+                    const customerId = this.dataset.id;
+                    showCustomerDetails(customerId);
+                });
+            });
+        }
+        
+        // Update statistics
+        function updateStats() {
+            // Total customers
+            document.getElementById('totalCustomers').textContent = customers.length;
+            
+            // Total loan volume
+            const totalLoanAmount = customers.reduce((sum, customer) => sum + (customer.loanAmount || 0), 0);
+            document.getElementById('totalLoans').textContent = '$' + totalLoanAmount.toLocaleString();
+            
+            // Average loan amount
+            const avgLoanAmount = customers.length > 0 ? totalLoanAmount / customers.length : 0;
+            document.getElementById('avgLoanAmount').textContent = '$' + Math.round(avgLoanAmount).toLocaleString();
+            
+            // Count duplicate contacts
+            const phoneNumbers = {};
+            let duplicateCount = 0;
+            
+            customers.forEach(customer => {
+                if (customer.primaryPhone) {
+                    phoneNumbers[customer.primaryPhone] = (phoneNumbers[customer.primaryPhone] || 0) + 1;
+                    if (phoneNumbers[customer.primaryPhone] === 2) {
+                        duplicateCount += 1;
+                    }
+                }
+            });
+            
+            document.getElementById('duplicateContacts').textContent = duplicateCount;
+        }
+        
+        // Show toast message
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            if (type === 'warning') icon = 'exclamation-triangle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                ${message}
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Show the toast
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            // Hide and remove the toast after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 3000);
+        }
+        
+        // Parse CSV data into an array of objects
+        function parseCSV(csv) {
+            // Split the CSV into rows
+            const rows = csv.split(/\r?\n/);
+            
+            // Extract header row (first row)
+            const headers = rows[0].split(',').map(header => header.trim());
+            
+            const data = [];
+            
+            // Process each row (skip header)
+            for (let i = 1; i < rows.length; i++) {
+                if (!rows[i].trim()) continue; // Skip empty rows
+                
+                const values = parseCSVRow(rows[i]);
+                
+                if (values.length !== headers.length) {
+                    console.warn(`Row ${i} has ${values.length} values, expected ${headers.length}`);
+                    // Try to continue anyway
+                }
+                
+                const obj = {};
+                
+                // Map each value to its header
+                for (let j = 0; j < Math.min(headers.length, values.length); j++) {
+                    obj[headers[j]] = values[j];
+                }
+                
+                data.push(obj);
+            }
+            
+            return data;
+        }
+        
+        // Parse a CSV row correctly handling quotes and commas
+        function parseCSVRow(row) {
+            const result = [];
+            let insideQuotes = false;
+            let currentValue = '';
+            
+            for (let i = 0; i < row.length; i++) {
+                const char = row[i];
+                
+                if (char === '"') {
+                    // Toggle inside quotes status
+                    insideQuotes = !insideQuotes;
+                } else if (char === ',' && !insideQuotes) {
+                    // End of field
+                    result.push(currentValue.trim());
+                    currentValue = '';
+                } else {
+                    // Add character to current field
+                    currentValue += char;
+                }
+            }
+            
+            // Add the last field
+            result.push(currentValue.trim());
+            
+            return result;
+        }
+        
+        // Convert CSV data to customers format
+        function convertCSVToCustomers(csvData) {
+            // This mapping can be adjusted based on your CSV structure
+            return csvData.map(row => {
+                // Try to extract first and last names
+                let primaryFirstName = '';
+                let primaryLastName = '';
+                
+                if (row.name) {
+                    const nameParts = row.name.split(' ');
+                    primaryFirstName = nameParts[0] || '';
+                    primaryLastName = nameParts.slice(1).join(' ') || '';
+                } else {
+                    primaryFirstName = row.firstName || row.primaryFirstName || '';
+                    primaryLastName = row.lastName || row.primaryLastName || '';
+                }
+                
+                return {
+                    id: Date.now().toString() + Math.floor(Math.random() * 1000),
+                    primaryFirstName: primaryFirstName,
+                    primaryLastName: primaryLastName,
+                    primaryFullName: (primaryFirstName + ' ' + primaryLastName).trim(),
+                    coFirstName: row.coFirstName || '',
+                    coLastName: row.coLastName || '',
+                    coFullName: row.coFirstName && row.coLastName ? row.coFirstName + ' ' + row.coLastName : '',
+                    primaryPhone: row.phone || row.primaryPhone || '',
+                    primaryCellPhone: row.cellPhone || row.primaryCellPhone || '',
+                    email: row.email || '',
+                    birthDate: row.birthDate || '',
+                    loanPurpose: row.loanPurpose || '',
+                    loanAmount: parseFloat(row.loanAmount) || 0,
+                    propertyValue: parseFloat(row.propertyValue) || 0,
+                    ltv: row.ltv || '',
+                    rate: row.rate || '',
+                    propertyAddress: row.propertyAddress || row.address || '',
+                    propertyState: row.propertyState || row.state || '',
+                    fundedDate: row.fundedDate || '',
+                    notes: row.notes || '',
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString()
+                };
+            });
+        }
+        
+        // Export data
+        function exportData() {
+            const data = {
+                customers: customers,
+                contactLogs: contactLogs
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `mortgage-customers-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            
+            URL.revokeObjectURL(url);
+            
+            showToast('Data exported successfully', 'success');
+            document.getElementById('importExport').classList.remove('active');
+        }
+        
+        // Import data
+        function importData() {
+            const file = document.getElementById('importFile').files[0];
+            
+            if (!file) {
+                showToast('Please select a file to import', 'error');
+                return;
+            }
+            
+            const fileType = document.querySelector('input[name="fileType"]:checked').value;
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    if (fileType === 'csv') {
+                        const csvData = parseCSV(e.target.result);
+                        if (csvData.length === 0) {
+                            showToast('No data found in CSV file', 'error');
+                            return;
+                        }
+                        
+                        const newCustomers = convertCSVToCustomers(csvData);
+                        customers = customers.concat(newCustomers);
+                        
+                        saveToLocalStorage();
+                        renderCustomerList();
+                        updateStats();
+                        
+                        showToast(`Imported ${newCustomers.length} customers successfully`, 'success');
+                    } else {
+                        // JSON import
+                        const data = JSON.parse(e.target.result);
+                        
+                        if (data.customers && Array.isArray(data.customers)) {
+                            customers = data.customers;
+                            contactLogs = data.contactLogs || [];
+                            
+                            saveToLocalStorage();
+                            renderCustomerList();
+                            updateStats();
+                            
+                            showToast('Data imported successfully', 'success');
+                        } else {
+                            showToast('Invalid JSON data format', 'error');
+                        }
+                    }
+                    
+                    document.getElementById('importExport').classList.remove('active');
+                } catch (error) {
+                    console.error('Import error:', error);
+                    showToast('Error parsing file: ' + error.message, 'error');
+                }
+            };
+            
+            reader.readAsText(file);
+        }
+        
+        function updateThemeButtonIcon(theme) {
+            const themeButton = document.getElementById('themeToggleBtn');
+            
+            // Remove existing content
+            themeButton.innerHTML = '';
+            
+            // Add new icon based on theme
+            if (theme === 'galaxy') {
+                themeButton.innerHTML = '<i class="fas fa-rocket"></i>';
+            } else if (theme === 'zen') {
+                themeButton.innerHTML = '<i class="fas fa-leaf"></i>';
+            } else {
+                themeButton.innerHTML = '<i class="fas fa-palette"></i>';
+            }
+        }
+        
+        // Setup theme toggle
+        function setupThemeToggle() {
+            const themeToggleBtn = document.getElementById('themeToggleBtn');
+            const themeMenu = document.getElementById('themeMenu');
+            const themeOptions = document.querySelectorAll('.theme-option');
+            
+            // Apply saved theme if any
+            const savedTheme = localStorage.getItem('mortgageTheme');
+            if (savedTheme) {
+                document.body.className = `theme-${savedTheme}`;
+                updateThemeButtonIcon(savedTheme);
+            }
+            
+            // Toggle theme menu
+            themeToggleBtn.addEventListener('click', function(e) {
+                console.log("Theme toggle clicked");
+                e.stopPropagation(); // Prevent immediate close
+                themeMenu.classList.toggle('active');
+            });
+            
+            // Close menu when clicking outside
+            document.addEventListener('click', function(e) {
+                if (!themeToggleBtn.contains(e.target) && !themeMenu.contains(e.target)) {
+                    themeMenu.classList.remove('active');
+                }
+            });
+            
+            // Theme selection
+            themeOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const theme = this.dataset.theme;
+                    console.log("Changing theme to", theme);
+                    
+                    // Remove all theme classes
+                    document.body.className = theme === 'default' ? '' : `theme-${theme}`;
+                    
+                    // Save preference
+                    localStorage.setItem('mortgageTheme', theme);
+                    
+                    // Update theme button icon
+                    updateThemeButtonIcon(theme);
+                    
+                    // Close menu
+                    themeMenu.classList.remove('active');
+                    
+                    // Update header based on theme
+                    updateThemeHeader(theme);
+                });
+            });
+        }
+        
+        function updateThemeHeader(theme) {
+            const header = document.querySelector('header h1');
+            const subheader = document.querySelector('.subheader');
+            
+            if (theme === 'default' || !theme) {
+                header.textContent = 'Mortgage Customer Manager';
+                subheader.textContent = 'Track and manage your funded loans and customer relationships';
+            } else if (theme === 'galaxy') {
+                header.textContent = 'Mortgage Customer Manager - Galaxy';
+                subheader.textContent = 'Navigate the universe of your mortgage portfolio';
+            } else if (theme === 'zen') {
+                header.textContent = 'Mortgage Customer Manager - Zen Garden';
+                subheader.textContent = 'Find balance and peace in your mortgage management';
+            }
+        }
+        
+        // Make functions global for onclick events
+        window.editCustomer = editCustomer;
+        window.deleteCustomer = deleteCustomer;
+        window.showCustomerDetails = showCustomerDetails;
+    </script>
+</body>
+</html>
